@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <link rel="stylesheet" href="style.css">
+    <%- include('menu.html') %>
+
+    <h1>게시판</h1>
+    <!-- <% data.forEach(item => { %>
+      <h3>제목 : <%= item.title %></h3>
+    <% }) %> -->
+    <div class="container input-group ml-2 my-3">
+      <input class="form-control sword" type="search" placeholder="검색"><button class="btn btn-success input-group-append sbtn">검색</button>
+    </div>
+
+    <table style="border:1px solid" class="table table-hover table-striped text-center container mt-4">
+      <thead>
+        <tr>
+          <th>제목</th>
+          <th>작성일</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- EJS 템플릿에서 _id 값을 출력하면 자동으로 문자열로 변환되어 렌더링 -->
+        <% for(let i=0; i < data.length; i++) { %>
+          <tr>
+            <td><a href="/content/<%= data[i]._id %>""><%= data[i].title %></a></td>
+            <td><%= data[i].someDate %></td>
+            <td><button class="delete btn btn-outline-danger" data-id="<%= data[i]._id %>">삭제</button></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <div class="container my-3">
+      <button class="btn btn-primary enter" style="float:right">글쓰기</button>
+    </div>
+
+    <script>
+      $(".delete").click(function(e){
+        console.log(e.target.dataset.id); // 문자열로 넘어옴
+        const id = e.target.dataset.id;
+        console.log(e.target);
+        let item = $(this); // 클릭한 해당 버튼
+        console.log(item);
+        
+        $.ajax({
+  
+          type:'post',
+          url:'/delete',
+          data: {_id : id}
+  
+        }).done(function(result){
+          // 성공
+          // 새로고침 방법
+          // document.location.reload();
+          // location.href = "";
+          // location.replace('');
+          item.parent('td').parent('tr').remove();
+  
+        }).fail(function(xhr, textStatus, errorThrown){
+          // 실패
+          console.log("게시물 삭제 실패");
+          console.log(xhr); //ajax 처리를 위해 사용되는 XMLHttpRequest 객체 원본. 이 객체에 오류코드가 포함됨.
+          console.log(textStatus); // "ERROR" 라는 고정값을 갖는 문자열이 전달.
+          console.log(errorThrown); // 오류의 원인을 의미하는 문자열이 전달된다. ex. 404 => "Page Not Found"
+        
+        })
+      })
+
+      $('.enter').click(function(){
+        location.href="/enter";
+      })
+
+      $('.sbtn').click(function(){
+        let searchValue = $('.sword').val();
+        location.href = '\\search?value=' + searchValue;
+      })
+
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>
